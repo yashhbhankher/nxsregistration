@@ -1,0 +1,244 @@
+<!index.html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NXS eSports Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .container {
+            background-color: #2c2c2c;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-family: 'SF Pro Display', Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #cccccc;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #00ff88;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #00cc6e;
+        }
+
+        .error {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            text-align: center;
+            color: #00ff88;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .countdown-timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff0000;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="countdown-timer" id="countdownTimer">Registration ends in: Calculating...</div>
+        <h1>NXS eSports Registration</h1>
+        <form class="form-section" id="registrationForm">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+            <div class="error" id="fullNameError">Please enter your full name</div>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter your email">
+            <div class="error" id="emailError">Please enter a valid email</div>
+
+            <label for="gameUsername">Gaming Username</label>
+            <input type="text" id="gameUsername" placeholder="Enter your gaming username">
+            <div class="error" id="gameUsernameError">Please enter your gaming username</div>
+
+            <label for="age">Age</label>
+            <input type="number" id="age" placeholder="Enter your age" min="16" max="99">
+            <div class="error" id="ageError">Please enter a valid age (16-99)</div>
+
+            <label for="game">Preferred Game</label>
+            <select id="game">
+                <option value="">Select a game</option>
+                <option value="freefire">Free Fire</option>
+            </select>
+            <div class="error" id="gameError">Please select a game</div>
+
+            <button type="button" onclick="register()">Register</button>
+        </form>
+        <div class="success-message" id="successMessage">Registration successful! Check your email for confirmation.</div>
+    </div>
+
+    <script>
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function register() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const gameUsername = document.getElementById('gameUsername').value.trim();
+            const age = document.getElementById('age').value.trim();
+            const game = document.getElementById('game').value;
+
+            // Reset error messages
+            document.getElementById('fullNameError').style.display = 'none';
+            document.getElementById('emailError').style.display = 'none';
+            document.getElementById('gameUsernameError').style.display = 'none';
+            document.getElementById('ageError').style.display = 'none';
+            document.getElementById('gameError').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+
+            let isValid = true;
+
+            // Validation
+            if (fullName === '') {
+                document.getElementById('fullNameError').style.display = 'block';
+                isValid = false;
+            }
+            if (!validateEmail(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            }
+            if (gameUsername === '') {
+                document.getElementById('gameUsernameError').style.display = 'block';
+                isValid = false;
+            }
+            if (age === '' || isNaN(age) || age < 16 || age > 99) {
+                document.getElementById('ageError').style.display = 'block';
+                isValid = false;
+            }
+            if (game === '') {
+                document.getElementById('gameError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Store registration data in localStorage as an array
+                const registrationData = {
+                    fullName,
+                    email,
+                    gameUsername,
+                    age: parseInt(age),
+                    game,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Retrieve existing registrations or initialize empty array
+                let registrations = JSON.parse(localStorage.getItem('esportsRegistrations')) || [];
+                
+                // Append new registration
+                registrations.push(registrationData);
+                
+                // Save updated registrations array
+                localStorage.setItem('esportsRegistrations', JSON.stringify(registrations));
+
+                // Show success message and reset form
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('registrationForm').reset();
+            }
+        }
+
+        // Enable Enter key submission
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    register();
+                }
+            });
+        });
+
+        // Countdown Timer
+        function updateCountdown() {
+            const targetDate = new Date('2025-07-13T00:00:00+05:30'); // July 13, 2025, 12:00 AM IST
+            const now = new Date();
+            const timeDiff = targetDate - now;
+
+            if (timeDiff <= 0) {
+                document.getElementById('countdownTimer').textContent = 'Registration closed!';
+                return;
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdownTimer').textContent = 
+                `Registration ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
